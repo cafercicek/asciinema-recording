@@ -89,7 +89,7 @@ ZIP-Inhalt:
 | `03_Video_oeffnen.txt` | HTML öffnen |
 | `LESEN.txt` | Start hier |
 
-**GitHub Actions:** bei jedem Push auf `main` wird dasselbe ZIP als Artifact `git-bare-repository-share` hochgeladen (Actions → Run → Artifacts). Optional auch auf GitHub Pages, falls Pages aktiviert ist.
+**GitHub Pages (optional):** workflow template is `.github/workflows/deploy-pages.yml.example` — rename to `deploy-pages.yml` only if Pages is enabled for the repo.
 
 ## Demo flow (in the cast)
 

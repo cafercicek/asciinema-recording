@@ -1,4 +1,6 @@
-# Deploy static recording HTML to GitHub Pages.
+# Example only — not active (GitHub ignores *.yml.example).
+# Needs GitHub Pages enabled on the repo (and org/Pages permissions if applicable).
+# To enable: copy/rename to deploy-pages.yml
 
 name: Deploy Pages
 
