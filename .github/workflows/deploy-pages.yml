@@ -1,0 +1,72 @@
+# Deploy static recording HTML to GitHub Pages.
+
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy-pages:
+    runs-on: ubuntu-latest 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare site + offline share zip
+        run: |
+          set -euo pipefail
+          mkdir -p _site/learn_git_bare_repo
+          # Self-contained player (offline assets bundled)
+          cp learn_git_bare_repo/git-bare-repository.html \
+            _site/learn_git_bare_repo/git-bare-repository.html
+          cp learn_git_bare_repo/git-bare-repository.html _site/index.html
+          # Optional raw cast next to HTML (not required by the bundled player)
+          cp learn_git_bare_repo/git-bare-repository.cast \
+            _site/learn_git_bare_repo/git-bare-repository.cast
+          # README next to the player (local / Pages)
+          cp learn_git_bare_repo/README.md \
+            _site/learn_git_bare_repo/README.md
+          # Offline share pack: HTML + README/Anleitung (.md) + Kurz-Hinweise (.txt)
+          bash learn_git_bare_repo/build_share_zip.sh
+          cp learn_git_bare_repo/git-bare-repository-share.zip \
+            _site/learn_git_bare_repo/git-bare-repository-share.zip
+          cp learn_git_bare_repo/git-bare-repository-share.zip \
+            _site/git-bare-repository-share.zip
+          # Skip Jekyll processing on Pages
+          touch _site/.nojekyll
+
+      - name: Upload share zip (Actions artifact — lokal herunterladen)
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-bare-repository-share
+          path: learn_git_bare_repo/git-bare-repository-share.zip
+          if-no-files-found: error
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
